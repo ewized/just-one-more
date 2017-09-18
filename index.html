@@ -1,0 +1,65 @@
+<html>
+<head>
+  <title>Just one more!</title>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+  <script>
+    let app = document.getElementById('app');
+
+    /** Get the settings */
+    function updateSettings() {
+      window.settings = {
+        key: query('key'),
+        counter: Number(query('counter', 0)),
+        prefix: query('prefix', 'Sub Goal: '),
+        style: {
+          color: query('color', 'white'),
+          fontFamily: query('font', 'sans-serif'),
+          fontSize: query('size', 24),
+          fontWeight: query('bold', 'bold'),
+        }
+      };
+      console.log('Current Settings: ' + JSON.stringify(window.settings, 2, ' '));
+    }
+
+    /** Update the counter style and text */
+    function updateCounter(subs) {
+      if (window.settings.key === '') {
+        app.innerHTML = 'Add your socket key to the url: ?key=SOCKET_API_KEY';
+      } else {
+        for (let key in window.settings.style) {
+          app.style[key] = window.settings.style[key];
+        }
+        let text = `${subs}/${subs + 1}`;
+        console.log('Updating sub count: ' + text);
+        app.innerHTML = window.settings.prefix + text;
+      }
+    }
+
+    /** Get the query value from the url */
+    function query(key, value = '') {
+      key = key.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      let regex = new RegExp('[\\?&]' + key + '=([^&#]*)');
+      let results = regex.exec(location.search);
+      return results === null ? value : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    /** Register the socket listener */
+    function registerSocketListener() {
+      const socket = io(`https://sockets.streamlabs.com?token=${window.settings.key}`);
+      socket.on('event', event => {
+        console.log('Socket Event: ' + JSON.stringify(event, 2, ' '));
+        if (event.for === 'twitch_account' && event.type === 'subscription') {
+          updateCounter(++window.settings.counter);
+        }
+      });
+    }
+
+    updateSettings();
+    updateCounter(window.settings.counter);
+    registerSocketListener();
+  </script>
+</body>
+</html>
