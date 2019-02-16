@@ -14,12 +14,12 @@
         key: query('key'),
         counter: Number(query('counter', 0)),
         prefix: query('prefix', 'Sub Goal: '),
+        event: query('event', 'subscription'),
         style: {
           color: query('color', 'white'),
           fontFamily: query('font', 'sans-serif'),
           fontSize: query('size', 24),
           fontWeight: query('bold', 'bold'),
-          event: query('event', 'subscription'),
         }
       };
       console.log('Current Settings: ' + JSON.stringify(window.settings, 2, ' '));
