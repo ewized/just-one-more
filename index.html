@@ -19,6 +19,7 @@
           fontFamily: query('font', 'sans-serif'),
           fontSize: query('size', 24),
           fontWeight: query('bold', 'bold'),
+          event: query('event', 'subscription'),
         }
       };
       console.log('Current Settings: ' + JSON.stringify(window.settings, 2, ' '));
@@ -51,7 +52,7 @@
       const socket = io(`https://sockets.streamlabs.com?token=${window.settings.key}`);
       socket.on('event', event => {
         console.log('Socket Event: ' + JSON.stringify(event, 2, ' '));
-        if (event.for === 'twitch_account' && event.type === 'subscription') {
+        if (event.for === 'twitch_account' && event.type === window.settings.event) {
           updateCounter(++window.settings.counter);
         }
       });
